@@ -1,0 +1,9 @@
+[book]
+authors = ["kurbatov"]
+language = "en"
+multilingual = true
+src = "src"
+title = "Notes"
+
+[build]
+build-dir = "notes"

@@ -1,0 +1,5 @@
+target
+notes
+*.exe
+*.pdb
+*github.io
