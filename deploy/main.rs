@@ -1,5 +1,5 @@
 use serde_derive::Deserialize;
-use std::fs;
+use std::{env, fs, io};
 
 use std::path::Path;
 use std::process::Command;
@@ -36,17 +36,42 @@ fn main() {
     if !repo_exist {
         let _ = Command::new("git").args(["clone", &url]).output();
     }
+
+    //let _ = Command::new("cd").args([repo_name]).output();
+    let _ = env::set_current_dir(&repo_dir);
+
     let _ = Command::new("git").args(["reset", "--hard"]).output();
     let _ = Command::new("git").args(["pull"]).output();
 
     let book_folder_name = book_config.build.build_dir;
 
-    let dir = format!("{}/{}", &repo_dir, &book_folder_name);
+    let dir = format!("./{}", &book_folder_name);
 
     let dir_exist = Path::new(&dir).is_dir();
     if dir_exist {
         std::fs::remove_dir_all(&dir).unwrap()
     }
 
-    
+    let _ = copy_dir_all(format!("./../{}", &book_folder_name), dir);
+
+    let _ = Command::new("git").args(["add", "."]).output();
+    let _ = Command::new("git")
+        .args(["commit", "-m", "\"update\""])
+        .output();
+
+    let _ = Command::new("git").args(["push"]).output();
+}
+
+fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    fs::create_dir_all(&dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        if ty.is_dir() {
+            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        }
+    }
+    Ok(())
 }
