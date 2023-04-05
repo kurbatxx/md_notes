@@ -11,7 +11,9 @@
 # Linux
 
 - [Linux](./linux/linux.md)
+    - [Postgres](./linux/postgres.md)
     - [Arch](./linux/arch.md)
+
 
 # Flutter
 - [Flutter](./flutter/flutter.md)
